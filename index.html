@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小天才视频站</title>
+    <!-- 引入Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 基础设置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #3B82F6;
+            --secondary-color: #FB7299;
+            --accent-color: #FFA500; /* 橙色强调色 */
+        }
+        
+        body {
+            background-image: url('https://t.alcy.cc/fj');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* 添加深色遮罩增强文字可读性 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+        
+        /* 毛玻璃效果容器 */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        /* 标题样式 - 橙色渐变 */
+        .site-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #FFA500, #FF8C00, #FF4500);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            line-height: 1.1;
+        }
+        
+        /* 一言区域样式 */
+        .hitokoto-container {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 165, 0, 0.15);
+            border-radius: 12px;
+            border-left: 4px solid #FFA500;
+            font-style: italic;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hitokoto-container::before {
+            content: """;
+            position: absolute;
+            top: -15px;
+            left: 10px;
+            font-size: 4rem;
+            color: rgba(255, 165, 0, 0.2);
+            font-family: Georgia, serif;
+        }
+        
+        /* 搜索框样式 */
+        .search-box-lg {
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            width: 400px;
+        }
+        
+        .search-box-lg:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.4);
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .search-box-lg::placeholder {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        
+        /* 主题标签样式 */
+        .theme-tag {
+            display: inline-block;
+            background: rgba(255, 165, 0, 0.3);
+            color: white;
+            border-radius: 50px;
+            padding: 8px 18px;
+            font-size: 1rem;
+            margin-right: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .theme-tag:hover, .theme-tag.active {
+            background: rgba(255, 165, 0, 0.7);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+        }
+        
+        /* 教程卡片样式 */
+        .tutorial-card {
+            transition: all 0.3s ease;
+            border-radius: 16px;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: rgba(20, 20, 30, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+        
+        .tutorial-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+            background: rgba(25, 25, 35, 0.8);
+            border-color: rgba(255, 165, 0, 0.4);
+        }
+        
+        .card-header {
+            padding: 22px;
+            background: linear-gradient(to right, #FF8C00, #FF6347);
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .card-body {
+            padding: 24px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tutorial-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #FFD700;
+            line-height: 1.4;
+        }
+        
+        .tutorial-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.25);
+        }
+        
+        .author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+        
+        .watch-btn {
+            padding: 10px 24px;
+            border-radius: 50px;
+            background: linear-gradient(to right, #FF6B9C, #FF416C);
+            color: white;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 16px rgba(255, 107, 156, 0.4);
+            font-size: 1.05rem;
+        }
+        
+        .watch-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(255, 107, 156, 0.6);
+        }
+        
+        /* 加载动画 */
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 6px solid var(--accent-color);
+            animation: spin 1.2s linear infinite;
+            margin: 2.5rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.7s ease-out forwards;
+        }
+        
+        .card-delay-1 { animation-delay: 0.1s; }
+        .card-delay-2 { animation-delay: 0.2s; }
+        .card-delay-3 { animation-delay: 0.3s; }
+        .card-delay-4 { animation-delay: 0.4s; }
+        
+        /* 统计卡片 */
+        .stat-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            background: rgba(255, 165, 0, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: #FFA500;
+        }
+        
+        .stat-label {
+            font-size: 1.05rem;
+            opacity: 0.9;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .header-row {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .tutorial-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .site-title {
+                font-size: 2.2rem;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+
+            .title-search-container {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+            .search-box-lg {
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .tutorial-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .tutorial-header-right {
+                margin-top: 15px;
+                width: 100%;
+            }
+        }
+
+        /* 标题和搜索框容器 */
+        .title-search-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        /* 教程头部容器 */
+        .tutorial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .tutorial-header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .tutorial-header-right {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="w-full max-w-6xl mx-auto py-8">
+        <!-- 标题和搜索区域 -->
+        <div class="header-row flex flex-col md:flex-row justify-between gap-8 mb-10">
+            <div class="glass-container p-8 flex-1">
+                <h1 class="site-title">小天才视频站</h1>
+                <!-- 一言区域 -->
+                <div id="hitokoto" class="hitokoto-container">
+                    正在加载一言...
+                </div>
+            </div>
+        </div>
+        
+        <!-- 主题过滤区域 -->
+        <div class="glass-container p-6 mb-8">
+            <h2 class="text-2xl font-bold text-white mb-5">主题分类</h2>
+            <div id="themeContainer" class="flex flex-wrap">
+                <span class="theme-tag active" data-theme="all">全部</span>
+                <!-- 主题标签将通过JS动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 教程展示区域 -->
+        <div class="glass-container p-8 mb-10">
+            <div class="tutorial-header">
+                <div class="tutorial-header-left">
+                    <h2 class="text-3xl font-bold text-white">教程</h2>
+                    <div class="relative">
+                        <input type="text" id="searchInput" class="search-box-lg" placeholder="搜索教程标题、主题或作者...">
+                        <i class="fas fa-search absolute right-5 top-3.5 text-white/80"></i>
+                    </div>
+                </div>
+                <div class="tutorial-header-right">
+                    <div class="text-white/85 text-xl" id="tutorialCount">加载中...</div>
+                </div>
+            </div>
+            
+            <!-- 教程网格 -->
+            <div id="tutorialContainer" class="tutorial-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="text-center py-10">
+                    <div class="loading-spinner"></div>
+                    <p class="text-white mt-5 text-lg">正在加载教程数据...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 统计信息 -->
+        <div class="glass-container p-6 mb-10">
+            <h2 class="text-2xl font-bold text-white mb-7 text-center">站点统计</h2>
+            <div class="stats-container grid grid-cols-1 md:grid-cols-3 gap-7">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-film text-orange-300"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalTutorials">0</div>
+                        <div class="stat-label">教程总数</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tags text-orange-300"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="themeCount">0</div>
+                        <div class="stat-label">主题分类</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user text-orange-300"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="authorCount">0</div>
+                        <div class="stat-label">作者数量</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            const tutorialContainer = document.getElementById('tutorialContainer');
+            const themeContainer = document.getElementById('themeContainer');
+            const searchInput = document.getElementById('searchInput');
+            const tutorialCount = document.getElementById('tutorialCount');
+            const totalTutorials = document.getElementById('totalTutorials');
+            const themeCount = document.getElementById('themeCount');
+            const authorCount = document.getElementById('authorCount');
+            const hitokotoElement = document.getElementById('hitokoto');
+            
+            // 存储教程数据
+            let tutorials = [];
+            let themes = [];
+            let authors = new Set();
+            
+            // 获取一言
+            function loadHitokoto() {
+                fetch('https://v1.hitokoto.cn/')
+                    .then(response => response.json())
+                    .then(data => {
+                        hitokotoElement.innerHTML = `${data.hitokoto} <br><div class="text-right mt-2 text-orange-300">—— ${data.from || '未知'}</div>`;
+                    })
+                    .catch(error => {
+                        console.error('加载一言失败:', error);
+                        hitokotoElement.innerHTML = '生活就像海洋，只有意志坚强的人才能到达彼岸<br><div class="text-right mt-2 text-orange-300">—— 卡尔·马克思</div>';
+                    });
+            }
+            
+            // 从info.txt加载数据
+            function loadTutorialData() {
+                fetch('info.txt')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('无法加载教程数据');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        processTutorialData(data);
+                    })
+                    .catch(error => {
+                        console.error('加载教程数据失败:', error);
+                        showError(`无法加载教程数据: ${error.message}`);
+                    });
+            }
+            
+            // 处理教程数据
+            function processTutorialData(data) {
+                const lines = data.split('\n');
+                tutorials = [];
+                themes = [];
+                authors.clear();
+                
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+                    
+                    const tutorial = {};
+                    const fields = line.split(';');
+                    
+                    for (const field of fields) {
+                        const [key, value] = field.split(':');
+                        if (key && value) {
+                            tutorial[key.trim()] = value.trim();
+                        }
+                    }
+                    
+                    if (tutorial['主题'] && tutorial['标题']) {
+                        tutorials.push(tutorial);
+                        
+                        // 收集主题
+                        if (!themes.includes(tutorial['主题'])) {
+                            themes.push(tutorial['主题']);
+                        }
+                        
+                        // 收集作者
+                        if (tutorial['作者']) {
+                            authors.add(tutorial['作者']);
+                        }
+                    }
+                }
+                
+                if (tutorials.length === 0) {
+                    showError("未找到有效的教程数据");
+                    return;
+                }
+                
+                // 更新统计信息
+                totalTutorials.textContent = tutorials.length;
+                themeCount.textContent = themes.length;
+                authorCount.textContent = authors.size;
+                tutorialCount.textContent = `共 ${tutorials.length} 个教程`;
+                
+                // 渲染主题标签
+                renderThemeTags();
+                
+                // 初始渲染教程
+                renderTutorials(tutorials);
+            }
+            
+            // 渲染主题标签
+            function renderThemeTags() {
+                // 清空现有标签
+                themeContainer.innerHTML = '<span class="theme-tag active" data-theme="all">全部</span>';
+                
+                // 添加主题标签
+                themes.forEach(theme => {
+                    const tag = document.createElement('span');
+                    tag.className = 'theme-tag';
+                    tag.textContent = theme;
+                    tag.setAttribute('data-theme', theme);
+                    tag.addEventListener('click', function() {
+                        // 移除所有active类
+                        document.querySelectorAll('.theme-tag').forEach(t => {
+                            t.classList.remove('active');
+                        });
+                        // 为当前标签添加active类
+                        this.classList.add('active');
+                        
+                        // 过滤教程
+                        const themeToFilter = this.getAttribute('data-theme');
+                        const filtered = filterTutorials(tutorials, searchInput.value, themeToFilter);
+                        renderTutorials(filtered);
+                    });
+                    
+                    themeContainer.appendChild(tag);
+                });
+
+                // 为"全部"标签添加点击事件
+                const allTag = themeContainer.querySelector('[data-theme="all"]');
+                allTag.addEventListener('click', function() {
+                    document.querySelectorAll('.theme-tag').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    const filtered = filterTutorials(tutorials, searchInput.value, 'all');
+                    renderTutorials(filtered);
+                });
+            }
+            
+            // 渲染教程卡片
+            function renderTutorials(tutorialsToRender) {
+                tutorialContainer.innerHTML = '';
+                
+                if (tutorialsToRender.length === 0) {
+                    tutorialContainer.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <i class="fas fa-file-excel text-5xl text-orange-400 mb-5"></i>
+                            <p class="text-white text-xl">没有找到匹配的教程</p>
+                            <p class="text-white/60 mt-4 text-sm">如果你想上传你的教程，请联系QQ345405851或在评论区@剑宗X</p>
+                        </div>
+                    `;
+                    tutorialCount.textContent = "没有找到教程";
+                    return;
+                }
+                
+                // 更新教程计数
+                tutorialCount.textContent = `共 ${tutorialsToRender.length} 个教程`;
+                
+                // 添加教程卡片
+                tutorialsToRender.forEach((tutorial, index) => {
+                    const card = document.createElement('div');
+                    card.className = `tutorial-card fade-in ${index < 4 ? 'card-delay-' + index : ''}`;
+                    card.innerHTML = `
+                        <div class="card-header">${tutorial['主题'] || '未分类'}</div>
+                        <div class="card-body">
+                            <div class="tutorial-title">${tutorial['标题'] || '未命名教程'}</div>
+                            <div class="tutorial-meta">
+                                <div class="author">
+                                    <i class="fas fa-user-circle"></i>
+                                    ${tutorial['作者'] || '未知作者'}
+                                </div>
+                                <button class="watch-btn" data-link="${tutorial['链接'] || '#'}">
+                                    <i class="fas fa-play-circle"></i> 观看
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    tutorialContainer.appendChild(card);
+                });
+                
+                // 添加按钮事件
+                document.querySelectorAll('.watch-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const link = this.getAttribute('data-link');
+                        if (link && link !== '#') {
+                            // 确保链接有协议
+                            const fullLink = link.startsWith('http') ? link : 'https://' + link;
+                            window.open(fullLink, '_blank');
+                        }
+                    });
+                });
+            }
+            
+            // 过滤教程
+            function filterTutorials(tutorials, searchTerm = '', theme = 'all') {
+                searchTerm = searchTerm.toLowerCase();
+                
+                return tutorials.filter(tutorial => {
+                    const matchesSearch = searchTerm === '' || 
+                        (tutorial['标题'] && tutorial['标题'].toLowerCase().includes(searchTerm)) ||
+                        (tutorial['作者'] && tutorial['作者'].toLowerCase().includes(searchTerm)) ||
+                        (tutorial['主题'] && tutorial['主题'].toLowerCase().includes(searchTerm));
+                    
+                    const matchesTheme = theme === 'all' || 
+                        (tutorial['主题'] && tutorial['主题'] === theme);
+                    
+                    return matchesSearch && matchesTheme;
+                });
+            }
+            
+            // 显示错误信息
+            function showError(message) {
+                tutorialContainer.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <i class="fas fa-exclamation-triangle text-5xl text-orange-400 mb-5"></i>
+                        <p class="text-white text-xl">${message}</p>
+                        <p class="text-white/80 mt-6">请确保info.txt文件存在且格式正确</p>
+                    </div>
+                `;
+                tutorialCount.textContent = "加载失败";
+            }
+            
+            // 初始化搜索功能
+            function initSearch() {
+                searchInput.addEventListener('input', function() {
+                    // 获取当前选中的主题
+                    const activeTheme = document.querySelector('.theme-tag.active')?.getAttribute('data-theme') || 'all';
+                    
+                    const filtered = filterTutorials(tutorials, this.value, activeTheme);
+                    renderTutorials(filtered);
+                });
+            }
+            
+            // 初始化页面
+            function initPage() {
+                loadHitokoto(); // 加载一言
+                loadTutorialData(); // 加载教程数据
+                initSearch(); // 初始化搜索功能
+                
+                // 每小时刷新一言
+                setInterval(loadHitokoto, 3600000);
+            }
+            
+            // 启动页面
+            initPage();
+        });
+    </script>
+</body>
+</html>
